@@ -5,7 +5,12 @@
     <VideoScreen :percentage="percentage" @sendCommand="sendCommand" />
 
     <div class="controls">
-      <KeyBoard class="keyboard" @sendCommand="sendCommand" />
+      <KeyBoard
+        class="keyboard"
+        @sendCommand="sendCommand"
+        :cmFlyPerRequest="cmFlyPerRequest"
+        :degreeRotatePerRequest="degreeRotatePerRequest"
+      />
       <div class="sliders-wrapper">
         <RangeSlider
           caption="set speed cm/s"
@@ -100,8 +105,6 @@ function getDroneCommandByKey(key: string) {
 
     KeyV: `${commands.control.videoStreamOn}`,
     KeyB: `${commands.control.videoStreamOff}`,
-
-    KeyR: `${commands.read.speed}`,
   };
 
   return droneCommand[key];
@@ -134,7 +137,6 @@ main {
   .sliders-wrapper {
     display: flex;
     flex-direction: column;
-    justify-content: space-evenly;
     width: 100%;
     max-width: 250px;
 

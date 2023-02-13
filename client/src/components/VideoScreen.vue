@@ -15,6 +15,7 @@
 import { onMounted, ref } from "vue";
 import JMuxer from "jmuxer";
 import socket from "@/utils/socket";
+import { commands } from "@/utils/commands";
 import { DroneEvent } from "@/utils/events";
 
 import BatteryStatus from "@/components/BatteryStatus.vue";
@@ -26,25 +27,19 @@ const emit = defineEmits<{ (e: "sendCommand", key: string): void }>();
 
 const isDroneConnect = ref(false);
 const isVideoStreamOn = ref(false);
+let jmuxer: JMuxer | null;
 
 onMounted(() => {
-  const jmuxer = new JMuxer({
-    node: "player",
-    mode: "video",
-    fps: 30,
-    debug: false,
-    flushingTime: 10,
-  });
-
   socket.on(DroneEvent.VideoStreamOn, (stream) => {
     const streamData = new Uint8Array(stream);
     isVideoStreamOn.value = true;
-    jmuxer.feed({ video: streamData });
+    jmuxer?.feed({ video: streamData });
   });
 
   socket.on(DroneEvent.VideoStreamOff, () => {
     console.warn("DroneEvent.VideoStreamOff");
     isVideoStreamOn.value = false;
+    jmuxer = null;
   });
 
   socket.on(DroneEvent.Status, () => {
@@ -60,6 +55,16 @@ onMounted(() => {
 
 function emitCommand(command: string) {
   emit("sendCommand", command);
+
+  if (command === commands.control.videoStreamOn && !isVideoStreamOn) {
+    jmuxer = new JMuxer({
+      node: "player",
+      mode: "video",
+      fps: 30,
+      debug: false,
+      flushingTime: 10,
+    });
+  }
 }
 </script>
 

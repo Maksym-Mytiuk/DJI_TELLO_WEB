@@ -2,6 +2,7 @@
   <div class="keyboard">
     <div class="row">
       <button
+        v-tooltip="'Emergency stop'"
         class="btn0 control-btn Escape"
         @mousedown="onMouseDown('Escape')"
       >
@@ -147,6 +148,7 @@
         <span class="sm">+<br />=</span>
       </button>
       <button
+        v-tooltip="'Land the drone'"
         class="btn3 control-btn Backspace"
         @mousedown="onMouseDown('Backspace')"
       >
@@ -182,13 +184,25 @@
       <button class="btn3">
         <span class="ll xs">tab</span>
       </button>
-      <button class="btn2 control-btn KeyQ" @mousedown="onMouseDown('KeyQ')">
+      <button
+        v-tooltip="`Turn clockwise on ${degreeRotatePerRequest} degrees`"
+        class="btn2 control-btn KeyQ"
+        @mousedown="onMouseDown('KeyQ')"
+      >
         <span>Q</span>
       </button>
-      <button class="btn2 control-btn KeyW" @mousedown="onMouseDown('KeyW')">
+      <button
+        v-tooltip="`fly forward on ${cmFlyPerRequest} cm`"
+        class="btn2 control-btn KeyW"
+        @mousedown="onMouseDown('KeyW')"
+      >
         <span>W</span>
       </button>
-      <button class="btn2 control-btn KeyE" @mousedown="onMouseDown('KeyE')">
+      <button
+        v-tooltip="`Turn counterсlockwise on ${degreeRotatePerRequest} degrees`"
+        class="btn2 control-btn KeyE"
+        @mousedown="onMouseDown('KeyE')"
+      >
         <span>E</span>
       </button>
       <button class="btn2">
@@ -255,7 +269,11 @@
       <button class="btn2 KeyA">
         <span>A</span>
       </button>
-      <button class="btn2 control-btn KeyS" @mousedown="onMouseDown('KeyS')">
+      <button
+        v-tooltip="`fly back on ${cmFlyPerRequest} cm`"
+        class="btn2 control-btn KeyS"
+        @mousedown="onMouseDown('KeyS')"
+      >
         <span>S</span>
       </button>
       <button class="btn2 KeyD">
@@ -287,7 +305,11 @@
       <button class="btn2">
         <span class="sm">&quot;<br />'</span>
       </button>
-      <button class="btn4 control-btn Enter" @mousedown="onMouseDown('Enter')">
+      <button
+        v-tooltip="`Connect with the drone`"
+        class="btn4 control-btn Enter"
+        @mousedown="onMouseDown('Enter')"
+      >
         <span class="lr xs">return</span>
       </button>
     </div>
@@ -309,6 +331,7 @@
     </div>
     <div class="row">
       <button
+        v-tooltip="`Take of the drone`"
         class="btn5 control-btn ShiftLeft"
         @mousedown="onMouseDown('ShiftLeft')"
       >
@@ -326,10 +349,18 @@
       <button class="btn2">
         <span>V</span>
       </button>
-      <button class="btn2">
+      <button
+        v-tooltip="`Start videostram`"
+        class="btn2 control-btn KeyE"
+        @mousedown="onMouseDown('KeyE')"
+      >
         <span>B</span>
       </button>
-      <button class="btn2">
+      <button
+        v-tooltip="`Finish videostream`"
+        class="btn2 control-btn KeyE"
+        @mousedown="onMouseDown('KeyE')"
+      >
         <span>N</span>
       </button>
       <button class="btn2">
@@ -345,6 +376,7 @@
         <span class="sm">?<br />/</span>
       </button>
       <button
+        v-tooltip="`Take of the drone`"
         class="btn5 control-btn ShiftRight"
         @mousedown="onMouseDown('ShiftRight')"
       >
@@ -353,6 +385,7 @@
     </div>
     <div class="row">
       <button
+        v-tooltip="`fly top on ${cmFlyPerRequest} cm`"
         class="btn2 control-btn ArrowUp"
         @mousedown="onMouseDown('ArrowUp')"
       >
@@ -387,10 +420,7 @@
         <span class="ll xs">command</span>
         <span class="lr xs noxscale">⌘</span>
       </button>
-      <button
-        class="btn-longest control-btn Space"
-        @mousedown="onMouseDown('Space')"
-      >
+      <button class="btn-longest">
         <span> </span>
       </button>
       <button class="btn7">
@@ -407,6 +437,7 @@
     </div>
     <div class="row">
       <button
+        v-tooltip="`fly left on ${cmFlyPerRequest} cm`"
         class="btn2 control-btn ArrowLeft"
         @mousedown="onMouseDown('ArrowLeft')"
       >
@@ -415,6 +446,7 @@
         </span>
       </button>
       <button
+        v-tooltip="`fly down on ${cmFlyPerRequest} cm`"
         class="btn2 control-btn ArrowDown"
         @mousedown="onMouseDown('ArrowDown')"
       >
@@ -423,6 +455,7 @@
         </span>
       </button>
       <button
+        v-tooltip="`fly right on ${cmFlyPerRequest} cm`"
         class="btn2 control-btn ArrowRight"
         @mousedown="onMouseDown('ArrowRight')"
       >
@@ -446,6 +479,8 @@
 import { onMounted, onUnmounted } from "vue";
 
 const emit = defineEmits<{ (e: "sendCommand", key: string): void }>();
+const props =
+  defineProps<{ degreeRotatePerRequest: number; cmFlyPerRequest: number }>();
 
 onMounted(() => {
   document.addEventListener("keydown", onKeydown);

@@ -16,7 +16,7 @@ DJI TELLO fullstack application
 1. Clone this repository locally
 2. Run `npm install` _ONLY_ in the root directory
 3. Run `npm start`
-4. Open in browser url `http://localhost:8080/`
+4. Open in browser url `http://localhost:5173/`
 
 ### Available commands
 

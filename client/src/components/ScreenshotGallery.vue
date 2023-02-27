@@ -1,7 +1,7 @@
 <template>
   <ul class="gallery">
     <li v-for="(screenshot, index) in screenshots" :key="index">
-      <a :href="screenshot" download="screenshot">
+      <a :href="screenshot" :download="`screenshot-${+new Date()}`">
         <img :src="screenshot" alt="screenshot" />
         <button>Download</button>
       </a>
@@ -10,8 +10,6 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref, type Ref } from "vue";
-
 const props = defineProps<{ screenshots: string[] }>();
 </script>
 

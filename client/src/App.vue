@@ -2,9 +2,20 @@
 
 <template>
   <main>
-    <VideoScreen :percentage="percentage" @sendCommand="sendCommand" />
+    <VideoScreen
+      :percentage="percentage"
+      :isControlsHidden="isControlsHidden"
+      @sendCommand="sendCommand"
+    />
 
-    <div class="controls">
+    <img
+      v-tooltip="'Toggle keyboard visibility'"
+      src="./assets/images/icon/keyboard.svg"
+      class="keyboard-icon"
+      :class="{ 'controls-hidden': isControlsHidden }"
+      @click="toggleControlsVisibility"
+    />
+    <div class="controls" :class="{ 'controls-hidden': isControlsHidden }">
       <KeyBoard
         class="keyboard"
         @sendCommand="sendCommand"
@@ -53,6 +64,8 @@ let percentage = ref(0);
 let cmFlyPerRequest = ref(20);
 let degreeRotatePerRequest = ref(30);
 
+let isControlsHidden = ref(false);
+
 onMounted(() => {
   socket.on(DroneEvent.State, (state) => {
     percentage.value = +state?.bat;
@@ -83,6 +96,10 @@ function setDistance(value: number) {
 
 function setAngle(value: number) {
   degreeRotatePerRequest.value = value;
+}
+
+function toggleControlsVisibility() {
+  isControlsHidden.value = !isControlsHidden.value;
 }
 
 function getDroneCommandByKey(key: string) {
@@ -121,18 +138,50 @@ main {
   overflow: hidden;
 
   @media (max-width: 1024px) {
+    padding: 0 10px;
     justify-content: space-evenly;
   }
 }
 
 .video-container {
   margin: 0 auto;
+
+  @media (max-width: 1265px) {
+    margin: 0 80px;
+  }
+
+  @media (max-width: 1120px) {
+    margin: 0;
+  }
+}
+
+.keyboard-icon {
+  position: fixed;
+  bottom: 10px;
+  left: 10px;
+  width: 64px;
+  opacity: 0.7;
+  transition: opacity 0.2s, transform 0.2s;
+  cursor: pointer;
+
+  &.controls-hidden {
+    transform: rotateX(180deg);
+  }
+
+  &:hover {
+    opacity: 1;
+  }
 }
 
 .controls {
   display: flex;
   justify-content: center;
   gap: 50px;
+
+  &.controls-hidden {
+    position: absolute;
+    top: 100%;
+  }
 
   .sliders-wrapper {
     display: flex;

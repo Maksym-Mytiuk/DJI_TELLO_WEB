@@ -351,15 +351,15 @@
       </button>
       <button
         v-tooltip="`Start videostram`"
-        class="btn2 control-btn KeyE"
-        @mousedown="onMouseDown('KeyE')"
+        class="btn2 control-btn KeyB"
+        @mousedown="onMouseDown('KeyB')"
       >
         <span>B</span>
       </button>
       <button
         v-tooltip="`Finish videostream`"
-        class="btn2 control-btn KeyE"
-        @mousedown="onMouseDown('KeyE')"
+        class="btn2 control-btn KeyN"
+        @mousedown="onMouseDown('KeyN')"
       >
         <span>N</span>
       </button>

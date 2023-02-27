@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="connection-status">
     <span class="status-icon" :class="isConnect && 'active'"></span>
     <span v-if="isConnect">Connect</span>
     <span v-else>Disconnect</span>
@@ -11,7 +11,7 @@ const props = defineProps<{ isConnect: boolean }>();
 </script>
 
 <style lang="scss" scoped>
-div {
+.connection-status {
   display: inline-flex;
   align-items: center;
   color: #ccc;

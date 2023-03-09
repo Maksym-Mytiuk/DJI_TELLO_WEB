@@ -12,7 +12,7 @@ export const initialize = (socket: Socket) => {
 
   droneSocket.on("message", (message) => {
     counter++;
-    if (counter === 45) {
+    if (counter === 10) {
       const state = parseState(message.toString());
       socket.emit("dronestate", state);
       counter = 0;

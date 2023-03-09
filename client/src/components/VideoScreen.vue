@@ -5,17 +5,25 @@
       :isVideoStreamOn="isVideoStreamOn"
       @sendCommand="emitCommand"
     />
-    <BatteryStatus :percentage="percentage" />
-    <ConnectionStatus :isConnect="isDroneConnect" />
-    <!-- <video ref="player" id="player" src="" autoplay></video> -->
-    <video
+    <div class="drone-statuses">
+      <div class="col">
+        <ConnectionStatus :isConnect="isDroneConnect" />
+      </div>
+      <div class="col" v-if="isDroneConnect">
+        <div>height: {{ height }}</div>
+        <div>fly time: {{ time }}</div>
+        <BatteryStatus :percentage="percentage" />
+      </div>
+    </div>
+    <video ref="player" id="player" src="" autoplay></video>
+    <!-- <video
       ref="player"
       id="player"
       src="../assets/video/sample-video_960x720.mp4"
       loop
       autoplay
       controls
-    ></video>
+    ></video> -->
     <PhotoButton v-if="isVideoStreamOn" @click="doScreenshot" />
     <ScreenshotGallery
       v-if="screenshots && !isControlsHidden"
@@ -36,41 +44,53 @@ import CoverScreen from "@/components/CoverScreen.vue";
 import PhotoButton from "@/components/PhotoButton.vue";
 import ScreenshotGallery from "@/components/ScreenshotGallery.vue";
 
-const props = defineProps<{ percentage: number; isControlsHidden: boolean }>();
+const props = defineProps<{ isControlsHidden: boolean }>();
 const emit = defineEmits<{ (e: "sendCommand", key: string): void }>();
 
-const isDroneConnect = ref(true);
-const isVideoStreamOn = ref(true);
+const isDroneConnect = ref(false);
+const isVideoStreamOn = ref(false);
+
+const percentage = ref(0);
+const height = ref(0.0);
+const time = ref("00:00");
 
 const player: Ref<HTMLVideoElement> | Ref<null> = ref(null);
 const screenshots: Ref<string[]> = ref([]);
 
 onMounted(() => {
-  // const jmuxer = new JMuxer({
-  //   node: player.value,
-  //   mode: "video",
-  //   fps: 30,
-  //   debug: false,
-  //   flushingTime: 150,
-  //   clearBuffer: true,
-  // });
-  // socket.on(DroneEvent.VideoStreamOn, (stream) => {
-  //   const streamData = new Uint8Array(stream);
-  //   isVideoStreamOn.value = true;
-  //   jmuxer.feed({ video: streamData });
-  // });
-  // socket.on(DroneEvent.VideoStreamOff, () => {
-  //   console.warn("DroneEvent.VideoStreamOff");
-  //   isVideoStreamOn.value = false;
-  // });
-  // socket.on(DroneEvent.Status, () => {
-  //   console.warn("DroneEvent.Status");
-  //   isDroneConnect.value = true;
-  // });
-  // socket.on(DroneEvent.Disconnect, () => {
-  //   isDroneConnect.value = false;
-  //   isVideoStreamOn.value = false;
-  // });
+  const video = player.value;
+  if (video) {
+    const jmuxer = new JMuxer({
+      node: video,
+      mode: "video",
+      fps: 30,
+      debug: false,
+      flushingTime: 100,
+    });
+    socket.on(DroneEvent.VideoStreamOn, (stream) => {
+      const streamData = new Uint8Array(stream);
+      isVideoStreamOn.value = true;
+      jmuxer.feed({ video: streamData });
+    });
+    socket.on(DroneEvent.VideoStreamOff, () => {
+      console.warn("DroneEvent.VideoStreamOff");
+      isVideoStreamOn.value = false;
+    });
+    socket.on(DroneEvent.Status, () => {
+      console.warn("DroneEvent.Status");
+      isDroneConnect.value = true;
+    });
+    socket.on(DroneEvent.Disconnect, () => {
+      isDroneConnect.value = false;
+      isVideoStreamOn.value = false;
+    });
+
+    socket.on(DroneEvent.State, (state) => {
+      time.value = getTimeFromSeconds(+state?.time || 0);
+      percentage.value = +state?.bat;
+      height.value = +state?.h;
+    });
+  }
 });
 
 function emitCommand(command: string) {
@@ -94,10 +114,24 @@ function doScreenshot() {
     screenshots.value.push(image);
   }
 }
+
+function getTimeFromSeconds(time: number) {
+  let minutes = Math.floor(time / 60);
+  let seconds = Math.floor(time % 60);
+
+  return `${convertNumericToTime(minutes)}:${convertNumericToTime(seconds)}`;
+}
+
+function convertNumericToTime(numeric: number) {
+  return numeric.toString().padStart(2, "0");
+}
 </script>
 
 <style lang="scss" scoped>
 .video-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: relative;
   max-width: 760px;
   max-height: 595px;
@@ -106,6 +140,10 @@ function doScreenshot() {
   padding: 40px 20px 20px;
   background: #222;
   border-radius: 16px;
+
+  video {
+    max-width: 720px;
+  }
 
   &.controls-hidden {
     max-width: 1000px;
@@ -118,20 +156,22 @@ function doScreenshot() {
   }
 }
 
-video {
-  max-width: 720px;
-}
-
-.battery {
+.drone-statuses {
   position: absolute;
   top: 15px;
-  right: 20px;
-}
-
-.connection-status {
-  position: absolute;
-  top: 15px;
-  left: 20px;
+  left: 0;
+  width: 100%;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 10px;
+  color: #fff;
+  .col {
+    display: flex;
+    align-items: center;
+    gap: 1.5em;
+  }
 }
 
 .photo-btn {

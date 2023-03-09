@@ -1,26 +1,15 @@
-
-
 <template>
   <main>
     <VideoScreen
-      :percentage="percentage"
       :isControlsHidden="isControlsHidden"
       @sendCommand="sendCommand"
-    />
-
-    <img
-      v-tooltip="'Toggle keyboard visibility'"
-      src="./assets/images/icon/keyboard.svg"
-      class="keyboard-icon"
-      :class="{ 'controls-hidden': isControlsHidden }"
-      @click="toggleControlsVisibility"
     />
     <div class="controls" :class="{ 'controls-hidden': isControlsHidden }">
       <KeyBoard
         class="keyboard"
-        @sendCommand="sendCommand"
         :cmFlyPerRequest="cmFlyPerRequest"
         :degreeRotatePerRequest="degreeRotatePerRequest"
+        @sendCommand="sendCommand"
       />
       <div class="sliders-wrapper">
         <RangeSlider
@@ -46,6 +35,14 @@
         />
       </div>
     </div>
+
+    <img
+      v-tooltip="'Toggle keyboard visibility'"
+      src="./assets/images/icon/keyboard.svg"
+      class="keyboard-icon"
+      :class="{ 'controls-hidden': isControlsHidden }"
+      @click="toggleControlsVisibility"
+    />
   </main>
 </template>
 
@@ -60,17 +57,12 @@ import VideoScreen from "@/components/VideoScreen.vue";
 import KeyBoard from "@/components/KeyBoard.vue";
 import RangeSlider from "@/components/RangeSlider.vue";
 
-let percentage = ref(0);
 let cmFlyPerRequest = ref(20);
 let degreeRotatePerRequest = ref(30);
 
 let isControlsHidden = ref(false);
 
 onMounted(() => {
-  socket.on(DroneEvent.State, (state) => {
-    percentage.value = +state?.bat;
-  });
-
   socket.on(DroneEvent.Disconnect, (arg: unknown) => {
     console.warn("disconnect");
     console.warn(arg);
@@ -79,8 +71,6 @@ onMounted(() => {
 
 function sendCommand(key: string) {
   const command = getDroneCommandByKey(key);
-  console.warn(command);
-
   if (command) {
     socket.emit(DroneEvent.Command, command);
   }
@@ -174,6 +164,7 @@ main {
 }
 
 .controls {
+  position: relative;
   display: flex;
   justify-content: center;
   gap: 50px;
@@ -221,5 +212,6 @@ body {
   background: #f2f2f2;
   font: 1em -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans,
     Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  overflow: hidden;
 }
 </style>

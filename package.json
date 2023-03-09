@@ -3,13 +3,12 @@
   "version": "0.1.0",
   "description": "DJI TELLO WEB",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "install:client": "npm install --prefix ./client",
     "install:server": "npm install --prefix ./server",
     "install": "npm run install:client && npm run install:server",
     "start:client": "npm start --prefix ./client",
     "start:server": "npm start --prefix ./server",
-    "start": "npm run start:client && npm run start:server"
+    "start": "concurrently \"npm run start:server\" \"npm run start:client\""
   },
   "repository": {
     "type": "git",
@@ -23,5 +22,8 @@
   "bugs": {
     "url": "https://github.com/Maksym-Mytiuk/DJI_TELLO_WEB/issues"
   },
-  "homepage": "https://github.com/Maksym-Mytiuk/DJI_TELLO_WEB#readme"
+  "homepage": "https://github.com/Maksym-Mytiuk/DJI_TELLO_WEB#readme",
+  "devDependencies": {
+    "concurrently": "^7.6.0"
+  }
 }

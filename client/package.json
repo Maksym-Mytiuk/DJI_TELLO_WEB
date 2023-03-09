@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@vueform/slider": "^2.1.7",
+    "floating-vue": "^2.0.0-beta.20",
     "jmuxer": "^2.0.5",
     "socket.io-client": "^4.5.4",
     "vue": "^3.2.45"

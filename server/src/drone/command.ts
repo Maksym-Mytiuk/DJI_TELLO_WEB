@@ -1,4 +1,4 @@
-import dgram from "dgram";
+import dgram from "node:dgram";
 import { Socket } from "socket.io";
 import { HOST, PORT_SET_DRONE_COMMAND } from "../utils/env";
 import { handleError } from "../utils/errorHandler";
@@ -9,18 +9,10 @@ export const initialize = (socket: Socket) => {
   const droneSocket = dgram.createSocket("udp4").bind(PORT_SET_DRONE_COMMAND);
 
   droneSocket.on("message", (status: string) => {
-    console.log(`status from drone - ${status}`);
-    console.log(status.toString());
-    console.log(typeof status);
-
     socket.emit("status", status.toString());
     if (status) {
       hasCommandWaitingResolve = false;
     }
-  });
-
-  droneSocket.on("listening", (status: any) => {
-    console.log(`listening from drone - ${status}`);
   });
 
   socket.on("command", (command: string) => {

@@ -51,7 +51,7 @@ const isDroneConnect = ref(false);
 const isVideoStreamOn = ref(false);
 
 const percentage = ref(0);
-const height = ref(0.0);
+const height = ref(0);
 const time = ref("00:00");
 
 const player: Ref<HTMLVideoElement> | Ref<null> = ref(null);

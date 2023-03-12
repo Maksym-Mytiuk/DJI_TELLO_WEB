@@ -2,7 +2,7 @@
   <div class="keyboard">
     <div class="row">
       <button
-        v-tooltip="'Emergency stop'"
+        v-tooltip="$t('emergencyStop')"
         class="btn0 control-btn Escape"
         @mousedown="onMouseDown('Escape')"
       >
@@ -148,7 +148,7 @@
         <span class="sm">+<br />=</span>
       </button>
       <button
-        v-tooltip="'Land the drone'"
+        v-tooltip="$t('landDrone')"
         class="btn3 control-btn Backspace"
         @mousedown="onMouseDown('Backspace')"
       >
@@ -185,21 +185,27 @@
         <span class="ll xs">tab</span>
       </button>
       <button
-        v-tooltip="`Turn clockwise on ${degreeRotatePerRequest} degrees`"
+        v-tooltip="
+          `${$t('turnClockwise')} ${degreeRotatePerRequest} ${$t('degrees')}`
+        "
         class="btn2 control-btn KeyQ"
         @mousedown="onMouseDown('KeyQ')"
       >
         <span>Q</span>
       </button>
       <button
-        v-tooltip="`fly forward on ${cmFlyPerRequest} cm`"
+        v-tooltip="`${$t('flyForward')} ${cmFlyPerRequest} ${$t('cm')}`"
         class="btn2 control-btn KeyW"
         @mousedown="onMouseDown('KeyW')"
       >
         <span>W</span>
       </button>
       <button
-        v-tooltip="`Turn counterсlockwise on ${degreeRotatePerRequest} degrees`"
+        v-tooltip="
+          `${$t('turnCounterClockwise')} ${degreeRotatePerRequest} ${$t(
+            'degrees'
+          )}`
+        "
         class="btn2 control-btn KeyE"
         @mousedown="onMouseDown('KeyE')"
       >
@@ -270,7 +276,7 @@
         <span>A</span>
       </button>
       <button
-        v-tooltip="`fly back on ${cmFlyPerRequest} cm`"
+        v-tooltip="`${$t('flyBack')} ${cmFlyPerRequest} ${$t('cm')}`"
         class="btn2 control-btn KeyS"
         @mousedown="onMouseDown('KeyS')"
       >
@@ -306,7 +312,7 @@
         <span class="sm">&quot;<br />'</span>
       </button>
       <button
-        v-tooltip="`Connect with the drone`"
+        v-tooltip="$t('connectWithDrone')"
         class="btn4 control-btn Enter"
         @mousedown="onMouseDown('Enter')"
       >
@@ -331,7 +337,7 @@
     </div>
     <div class="row">
       <button
-        v-tooltip="`Take of the drone`"
+        v-tooltip="$t('takeOffDrone')"
         class="btn5 control-btn ShiftLeft"
         @mousedown="onMouseDown('ShiftLeft')"
       >
@@ -350,14 +356,14 @@
         <span>V</span>
       </button>
       <button
-        v-tooltip="`Start videostram`"
+        v-tooltip="$t('startVideoStream')"
         class="btn2 control-btn KeyB"
         @mousedown="onMouseDown('KeyB')"
       >
         <span>B</span>
       </button>
       <button
-        v-tooltip="`Finish videostream`"
+        v-tooltip="$t('finishVideoStream')"
         class="btn2 control-btn KeyN"
         @mousedown="onMouseDown('KeyN')"
       >
@@ -385,7 +391,7 @@
     </div>
     <div class="row">
       <button
-        v-tooltip="`fly top on ${cmFlyPerRequest} cm`"
+        v-tooltip="`${$t('flyTop')} ${cmFlyPerRequest} ${$t('cm')}`"
         class="btn2 control-btn ArrowUp"
         @mousedown="onMouseDown('ArrowUp')"
       >
@@ -437,7 +443,7 @@
     </div>
     <div class="row">
       <button
-        v-tooltip="`fly left on ${cmFlyPerRequest} cm`"
+        v-tooltip="`${$t('flyLeft')} ${cmFlyPerRequest} ${$t('cm')}`"
         class="btn2 control-btn ArrowLeft"
         @mousedown="onMouseDown('ArrowLeft')"
       >
@@ -446,7 +452,7 @@
         </span>
       </button>
       <button
-        v-tooltip="`fly down on ${cmFlyPerRequest} cm`"
+        v-tooltip="`${$t('flyDown')} ${cmFlyPerRequest} ${$t('cm')}`"
         class="btn2 control-btn ArrowDown"
         @mousedown="onMouseDown('ArrowDown')"
       >
@@ -455,7 +461,7 @@
         </span>
       </button>
       <button
-        v-tooltip="`fly right on ${cmFlyPerRequest} cm`"
+        v-tooltip="`${$t('flyRight')} ${cmFlyPerRequest} ${$t('cm')}`"
         class="btn2 control-btn ArrowRight"
         @mousedown="onMouseDown('ArrowRight')"
       >
@@ -479,8 +485,10 @@
 import { onMounted, onUnmounted } from "vue";
 
 const emit = defineEmits<{ (e: "sendCommand", key: string): void }>();
-const props =
-  defineProps<{ degreeRotatePerRequest: number; cmFlyPerRequest: number }>();
+const props = defineProps<{
+  degreeRotatePerRequest: number;
+  cmFlyPerRequest: number;
+}>();
 
 onMounted(() => {
   document.addEventListener("keydown", onKeydown);

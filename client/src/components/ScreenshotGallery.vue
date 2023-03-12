@@ -1,9 +1,9 @@
 <template>
   <ul class="gallery">
     <li v-for="(screenshot, index) in screenshots" :key="index">
-      <a :href="screenshot" :download="`screenshot-${+new Date()}`">
-        <img :src="screenshot" alt="screenshot" />
-        <button>Download</button>
+      <a :href="screenshot" :download="`${$t('screenshot')}-${+new Date()}`">
+        <img :src="screenshot" :alt="$t('screenshot')" />
+        <button>{{ $t("download") }}</button>
       </a>
     </li>
   </ul>

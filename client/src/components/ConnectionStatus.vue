@@ -1,8 +1,8 @@
 <template>
   <div class="connection-status">
     <span class="status-icon" :class="isConnect && 'active'"></span>
-    <span v-if="isConnect">Connect</span>
-    <span v-else>Disconnect</span>
+    <span v-if="isConnect">{{ $t("connect") }}</span>
+    <span v-else>{{ $t("disconnect") }}</span>
   </div>
 </template>
 

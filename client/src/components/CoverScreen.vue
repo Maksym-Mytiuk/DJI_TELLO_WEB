@@ -1,11 +1,9 @@
 <template>
   <p v-if="!isConnect && !isVideoStreamOn" @click="emitCommand('Enter')">
-    Click here or press Enter <br />
-    to start connection with drone
+    {{ $t("startDroneConnectInfo") }}
   </p>
   <p v-if="isConnect && !isVideoStreamOn" @click="emitCommand('KeyV')">
-    Click here or press V <br />
-    to start video stream
+    {{ $t("startVideoStreamInfo") }}
   </p>
 </template>
 
@@ -24,7 +22,7 @@ function emitCommand(command: string) {
 <style lang="scss" scoped>
 p {
   position: absolute;
-  inset: 0;
+  inset: 0 50px;
   display: flex;
   align-items: center;
   justify-content: center;

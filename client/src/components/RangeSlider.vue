@@ -10,11 +10,15 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { ref } from "vue";
 import Slider from "@vueform/slider";
 
-const props =
-  defineProps<{ caption?: string; min: number; max: number; init: number }>();
+const props = defineProps<{
+  caption?: string;
+  min: number;
+  max: number;
+  init: number;
+}>();
 const emit = defineEmits<{ (e: "update", value: number): void }>();
 
 const speed = ref(props.init);

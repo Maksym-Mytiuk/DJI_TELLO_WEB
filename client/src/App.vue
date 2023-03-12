@@ -13,21 +13,21 @@
       />
       <div class="sliders-wrapper">
         <RangeSlider
-          caption="set speed cm/s"
+          :caption="$t('setSpeed')"
           :min="10"
           :max="100"
           :init="100"
           @update="setSpeed"
         />
         <RangeSlider
-          caption="set fly distance cm/s"
+          :caption="$t('setDistance')"
           :min="20"
           :max="500"
           :init="cmFlyPerRequest"
           @update="setDistance"
         />
         <RangeSlider
-          caption="set rotate angle cm/s"
+          :caption="$t('setRotate')"
           :min="1"
           :max="360"
           :init="degreeRotatePerRequest"
@@ -37,12 +37,14 @@
     </div>
 
     <img
-      v-tooltip="'Toggle keyboard visibility'"
+      v-tooltip="$t('toggleControls')"
       src="./assets/images/icon/keyboard.svg"
       class="keyboard-icon"
       :class="{ 'controls-hidden': isControlsHidden }"
       @click="toggleControlsVisibility"
     />
+
+    <LanguageDropdown />
   </main>
 </template>
 
@@ -56,6 +58,7 @@ import { DroneEvent } from "@/utils/events";
 import VideoScreen from "@/components/VideoScreen.vue";
 import KeyBoard from "@/components/KeyBoard.vue";
 import RangeSlider from "@/components/RangeSlider.vue";
+import LanguageDropdown from "@/components/LanguageDropdown.vue";
 
 let cmFlyPerRequest = ref(20);
 let degreeRotatePerRequest = ref(30);
@@ -199,6 +202,12 @@ main {
     flex-direction: column-reverse;
     align-items: center;
   }
+}
+
+.language-dropdown {
+  position: absolute;
+  top: 1em;
+  right: 1em;
 }
 </style>
 

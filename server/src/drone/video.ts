@@ -5,7 +5,7 @@ import { handleError } from "../utils/errorHandler";
 
 export const initialize = (socket: Socket) => {
   const videoConnection = dgram.createSocket("udp4").bind(PORT_GET_DRONE_VIDEO);
-  const countFramePerRequest = 3;
+  const countFramePerRequest = 15;
   let counter = 0;
   let videoBuffer: Buffer[] = [];
 

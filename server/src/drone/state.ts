@@ -1,7 +1,8 @@
+// @ts-ignore
 import dgram from "dgram";
 import { Socket } from "socket.io";
 
-import { PORT_GET_DRONE_STATE } from "../utils/env";
+import { PORT_GET_DRONE_STATE} from "../utils/env";
 import { parseState } from "../utils/parseDroneState";
 import { handleError } from "../utils/errorHandler";
 

@@ -1,16 +1,41 @@
+
 <template>
   <ul class="gallery">
     <li v-for="(screenshot, index) in screenshots" :key="index">
-      <a :href="screenshot" :download="`${$t('screenshot')}-${+new Date()}`">
-        <img :src="screenshot" :alt="$t('screenshot')" />
-        <button>{{ $t("download") }}</button>
-      </a>
+      <img :src="screenshot.img" :alt="$t('screenshot')" />
+      <div class="btn-container">
+        <a
+          :href="screenshot.img"
+          :download="`${$t('screenshot')}-${+new Date()}`"
+        >
+          <button class="download-screenshot" v-tooltip="$t('download')">
+            <img
+              src="@/assets/images/icon/download.png"
+              :alt="$t('download')"
+            />
+          </button>
+        </a>
+        <button
+          class="delete-screenshot"
+          @click="deleteScreenshot(screenshot.key)"
+          v-tooltip="$t('delete')"
+        >
+          <img src="@/assets/images/icon/trash.png" :alt="$t('delete')" />
+        </button>
+      </div>
     </li>
   </ul>
 </template>
 
 <script setup lang="ts">
-const props = defineProps<{ screenshots: string[] }>();
+const props = defineProps<{
+  screenshots: { img: string; key: string }[];
+}>();
+const emit = defineEmits<{ (e: "deleteScreenshot", key: any): void }>();
+
+function deleteScreenshot(key: any) {
+  emit("deleteScreenshot", key);
+}
 </script>
 
 <style lang="scss" scoped>
@@ -19,18 +44,18 @@ const props = defineProps<{ screenshots: string[] }>();
 }
 
 li {
-  margin-bottom: 1em;
-}
-
-a {
   position: relative;
-  display: flex;
-  width: max-content;
+  margin-bottom: 1em;
+
   &:hover {
-    button {
+    .btn-container {
       opacity: 1;
     }
   }
+}
+
+a {
+  text-decoration: none;
 }
 
 img {
@@ -38,18 +63,25 @@ img {
   width: 200px;
 }
 
-button {
+.btn-container {
+  display: inline-flex;
+  gap: 0.75em;
+
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
 
-  display: inline-block;
-  padding: 0.375rem 0.75rem;
+  opacity: 0;
+}
+
+button {
+  display: flex;
+  padding: 0.375rem;
   font-size: 1rem;
   color: #fff;
-  background-color: #007bff;
-  border: 1px solid #007bff;
+  background-color: #03a9f4;
+  border: 1px solid #03a9f4;
   border-radius: 0.25rem;
   white-space: nowrap;
   user-select: none;
@@ -58,16 +90,20 @@ button {
     opacity 0.2s ease-in-out;
   cursor: pointer;
 
-  opacity: 0;
-
   &:hover {
-    background-color: #0069d9;
-    border-color: #0062cc;
+    background-color: #1485fd;
+    border-color: #1485fd;
   }
 
   &:active {
-    background-color: #0062cc;
-    border-color: #005cbf;
+    background-color: #1a87fa;
+    border-color: #1a87fa;
+  }
+
+  img {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
   }
 }
 </style>

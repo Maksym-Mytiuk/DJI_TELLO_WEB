@@ -10,24 +10,25 @@
         <ConnectionStatus :isConnect="isDroneConnect" />
       </div>
       <div class="col" v-if="isDroneConnect">
-        <div>height: {{ height }}</div>
-        <div>fly time: {{ time }}</div>
+        <div>{{ $t("height") }}: {{ height }}</div>
+        <div>{{ $t("flyTime") }}: {{ time }}</div>
         <BatteryStatus :percentage="percentage" />
       </div>
     </div>
-    <video ref="player" id="player" src="" autoplay></video>
-    <!-- <video
+    <!-- <video ref="player" id="player" src="" autoplay></video> -->
+    <video
+      autoplay
+      controls
+      loop
       ref="player"
       id="player"
       src="../assets/video/sample-video_960x720.mp4"
-      loop
-      autoplay
-      controls
-    ></video> -->
+    ></video>
     <PhotoButton v-if="isVideoStreamOn" @click="doScreenshot" />
     <ScreenshotGallery
       v-if="screenshots && !isControlsHidden"
       :screenshots="screenshots"
+      @deleteScreenshot="deleteScreenshot"
     />
   </div>
 </template>
@@ -37,6 +38,7 @@ import { onMounted, ref, type Ref } from "vue";
 import JMuxer from "jmuxer";
 import socket from "@/utils/socket";
 import { DroneEvent } from "@/utils/events";
+import ScreenshotDB from "@/utils/screenshotDB";
 
 import BatteryStatus from "@/components/BatteryStatus.vue";
 import ConnectionStatus from "@/components/ConnectionStatus.vue";
@@ -44,60 +46,65 @@ import CoverScreen from "@/components/CoverScreen.vue";
 import PhotoButton from "@/components/PhotoButton.vue";
 import ScreenshotGallery from "@/components/ScreenshotGallery.vue";
 
+export type Screenshot = { img: string; key: any };
+
 const props = defineProps<{ isControlsHidden: boolean }>();
 const emit = defineEmits<{ (e: "sendCommand", key: string): void }>();
 
-const isDroneConnect = ref(false);
-const isVideoStreamOn = ref(false);
+const isDroneConnect = ref(true);
+const isVideoStreamOn = ref(true);
 
 const percentage = ref(0);
 const height = ref(0);
 const time = ref("00:00");
 
 const player: Ref<HTMLVideoElement> | Ref<null> = ref(null);
-const screenshots: Ref<string[]> = ref([]);
+const screenshots: Ref<Screenshot[]> = ref([]);
 
-onMounted(() => {
-  const video = player.value;
-  if (video) {
-    const jmuxer = new JMuxer({
-      node: video,
-      mode: "video",
-      fps: 30,
-      debug: false,
-      flushingTime: 100,
-    });
-    socket.on(DroneEvent.VideoStreamOn, (stream) => {
-      const streamData = new Uint8Array(stream);
-      isVideoStreamOn.value = true;
-      jmuxer.feed({ video: streamData });
-    });
-    socket.on(DroneEvent.VideoStreamOff, () => {
-      console.warn("DroneEvent.VideoStreamOff");
-      isVideoStreamOn.value = false;
-    });
-    socket.on(DroneEvent.Status, () => {
-      console.warn("DroneEvent.Status");
-      isDroneConnect.value = true;
-    });
-    socket.on(DroneEvent.Disconnect, () => {
-      isDroneConnect.value = false;
-      isVideoStreamOn.value = false;
-    });
+const screenshotDB = new ScreenshotDB();
 
-    socket.on(DroneEvent.State, (state) => {
-      time.value = getTimeFromSeconds(+state?.time || 0);
-      percentage.value = +state?.bat;
-      height.value = +state?.h;
-    });
-  }
+onMounted(async () => {
+  //   const video = player.value;
+  //   if (video) {
+  //     const jmuxer = new JMuxer({
+  //       node: video,
+  //       mode: "video",
+  //       fps: 30,
+  //       debug: false,
+  //       flushingTime: 50,
+  //     });
+  //     socket.on(DroneEvent.VideoStreamOn, (stream) => {
+  //       const streamData = new Uint8Array(stream);
+  //       isVideoStreamOn.value = true;
+  //       jmuxer.feed({ video: streamData });
+  //     });
+  //     socket.on(DroneEvent.VideoStreamOff, () => {
+  //       console.warn("DroneEvent.VideoStreamOff");
+  //       isVideoStreamOn.value = false;
+  //     });
+  //     socket.on(DroneEvent.Status, () => {
+  //       console.warn("DroneEvent.Status");
+  //       isDroneConnect.value = true;
+  //     });
+  //     socket.on(DroneEvent.Disconnect, () => {
+  //       isDroneConnect.value = false;
+  //       isVideoStreamOn.value = false;
+  //     });
+  //     socket.on(DroneEvent.State, (state) => {
+  //       time.value = getTimeFromSeconds(+state?.time || 0);
+  //       percentage.value = +state?.bat;
+  //       height.value = +state?.h;
+  //     });
+  //   }
+
+  await getScreenshots();
 });
 
 function emitCommand(command: string) {
   emit("sendCommand", command);
 }
 
-function doScreenshot() {
+async function doScreenshot() {
   const canvas = document.createElement("canvas") as HTMLCanvasElement;
   const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
 
@@ -109,10 +116,29 @@ function doScreenshot() {
     canvas.height = droneVideoHeight;
 
     ctx.drawImage(player.value, 0, 0, droneVideoWidth, droneVideoHeight);
-    const image = canvas.toDataURL("image/webp");
+    const screenshot = canvas.toDataURL("image/webp");
 
-    screenshots.value.push(image);
+    saveScreenshot(screenshot);
   }
+}
+
+async function saveScreenshot(img: string) {
+  const blob = await fetch(img).then((res) => res.blob());
+  const screenshot = await screenshotDB.saveScreenshot(blob);
+
+  screenshots.value.push(screenshot);
+}
+
+async function deleteScreenshot(key: number) {
+  await screenshotDB.deleteScreenshot(key);
+
+  screenshots.value = screenshots.value.filter(
+    (screenshot) => screenshot.key !== key
+  );
+}
+
+async function getScreenshots() {
+  screenshots.value = await screenshotDB.getScreenshots();
 }
 
 function getTimeFromSeconds(time: number) {
@@ -185,9 +211,8 @@ function convertNumericToTime(numeric: number) {
   max-height: 580px;
   position: fixed;
   top: 20px;
-  right: 20px;
+  right: 40px;
   overflow-y: scroll;
-  cursor: pointer;
 
   &::-webkit-scrollbar {
     width: 15px;

@@ -18,8 +18,6 @@
 import { computed, ref } from "vue";
 import { i18n, languages, type language } from "@/localize";
 
-const emit = defineEmits<{ (e: "changeLanguage", lang: string): void }>();
-
 const isShow = ref(false);
 const selectedLanguage = ref(
   languages.includes(i18n.global.locale) ? i18n.global.locale : languages[1]

@@ -206,8 +206,8 @@ main {
 
 .language-dropdown {
   position: absolute;
-  top: 1em;
-  right: 1em;
+  top: 0.5em;
+  right: 0.5em;
 }
 </style>
 

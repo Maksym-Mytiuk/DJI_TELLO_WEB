@@ -76,7 +76,7 @@ const isPopupOpen = ref(false);
 let popupMediaFile = reactive({}) as MediaFile;
 
 const isVideoRecording = ref(false);
-let videoRecorder: MediaRecorder;
+let videoRecorder: MediaRecorder | null;
 const recordedChunks: BlobPart[] = [];
 const fps = 30;
 
@@ -142,7 +142,11 @@ function startRecording() {
 
 function stopRecording() {
   isVideoRecording.value = false;
-  videoRecorder.stop();
+  if (videoRecorder) {
+    videoRecorder.stop();
+    videoRecorder = null;
+    recordedChunks.length = 0;
+  }
 }
 
 function openPopup(key: any) {

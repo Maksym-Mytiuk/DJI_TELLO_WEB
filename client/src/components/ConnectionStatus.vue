@@ -7,7 +7,7 @@
 </template>
 
 <script setup lang="ts">
-const props = defineProps<{ isConnect: boolean }>();
+defineProps<{ isConnect: boolean }>();
 </script>
 
 <style lang="scss" scoped>

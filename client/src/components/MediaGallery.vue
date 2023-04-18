@@ -1,14 +1,30 @@
 
 <template>
   <ul class="gallery">
-    <li v-for="(screenshot, index) in screenshots" :key="index">
-      <img :src="screenshot.img" :alt="$t('screenshot')" />
+    <li v-for="item in media" :key="item.key">
+      <img
+        v-if="item.type.includes('image')"
+        class="media"
+        :src="item.url"
+        :alt="$t('image')"
+      />
+      <video
+        v-if="item.type.includes('video')"
+        controls
+        class="media"
+        :src="item.url"
+        :alt="$t('video')"
+      ></video>
       <div class="btn-container">
-        <a
-          :href="screenshot.img"
-          :download="`${$t('screenshot')}-${+new Date()}`"
+        <button
+          class="open-media"
+          @click="openMedia(item.key)"
+          v-tooltip="$t('open')"
         >
-          <button class="download-screenshot" v-tooltip="$t('download')">
+          <img src="@/assets/images/icon/zoom-in.png" :alt="$t('open')" />
+        </button>
+        <a :href="item.url" :download="`${$t('file')}-${+new Date()}`">
+          <button class="download-media" v-tooltip="$t('download')">
             <img
               src="@/assets/images/icon/download.png"
               :alt="$t('download')"
@@ -16,8 +32,8 @@
           </button>
         </a>
         <button
-          class="delete-screenshot"
-          @click="deleteScreenshot(screenshot.key)"
+          class="delete-media"
+          @click="deleteMedia(item.key)"
           v-tooltip="$t('delete')"
         >
           <img src="@/assets/images/icon/trash.png" :alt="$t('delete')" />
@@ -28,13 +44,19 @@
 </template>
 
 <script setup lang="ts">
-const props = defineProps<{
-  screenshots: { img: string; key: string }[];
-}>();
-const emit = defineEmits<{ (e: "deleteScreenshot", key: any): void }>();
+import type { MediaFile } from "@/components/VideoScreen.vue";
 
-function deleteScreenshot(key: any) {
-  emit("deleteScreenshot", key);
+defineProps<{ media: MediaFile[] }>();
+const emit = defineEmits<{
+  (e: "deleteMedia", key: any): void;
+  (e: "openMedia", key: any): void;
+}>();
+
+function deleteMedia(key: any) {
+  emit("deleteMedia", key);
+}
+function openMedia(key: any) {
+  emit("openMedia", key);
 }
 </script>
 
@@ -58,7 +80,7 @@ a {
   text-decoration: none;
 }
 
-img {
+.media {
   position: relative;
   width: 200px;
 }
@@ -101,8 +123,8 @@ button {
   }
 
   img {
-    width: 24px;
-    height: 24px;
+    width: 18px;
+    height: 18px;
     cursor: pointer;
   }
 }

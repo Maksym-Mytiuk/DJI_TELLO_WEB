@@ -6,6 +6,7 @@
 .photo-btn {
   --btn-size: 45px;
   position: relative;
+  top: -4px;
   width: var(--btn-size);
   height: var(--btn-size);
   background: #fff;

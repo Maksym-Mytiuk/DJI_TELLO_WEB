@@ -15,96 +15,150 @@
         <BatteryStatus :percentage="percentage" />
       </div>
     </div>
-    <!-- <video ref="player" id="player" src="" autoplay></video> -->
-    <video
-      autoplay
-      controls
-      loop
-      ref="player"
-      id="player"
-      src="../assets/video/sample-video_960x720.mp4"
-    ></video>
-    <PhotoButton v-if="isVideoStreamOn" @click="doScreenshot" />
-    <ScreenshotGallery
-      v-if="screenshots && !isControlsHidden"
-      :screenshots="screenshots"
-      @deleteScreenshot="deleteScreenshot"
+    <video ref="player" id="player" src="" autoplay></video>
+    <div class="media-btn-container">
+      <PhotoButton v-if="isVideoStreamOn" @click="takePhoto" />
+      <VideoButton
+        v-if="isVideoStreamOn"
+        :isVideoRecording="isVideoRecording"
+        @startRecording="startRecording"
+        @stopRecording="stopRecording"
+      />
+    </div>
+
+    <MediaGallery
+      v-if="media && !isControlsHidden"
+      :media="media"
+      @deleteMedia="deleteMedia"
+      @openMedia="openPopup"
+    />
+
+    <MediaPopup
+      :isOpen="isPopupOpen"
+      :mediaFile="popupMediaFile"
+      @closePopup="closePopup"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, type Ref } from "vue";
+import { onMounted, reactive, ref, type Ref } from "vue";
 import JMuxer from "jmuxer";
 import socket from "@/utils/socket";
 import { DroneEvent } from "@/utils/events";
-import ScreenshotDB from "@/utils/screenshotDB";
+import MediaDB from "@/utils/mediaDB";
 
 import BatteryStatus from "@/components/BatteryStatus.vue";
 import ConnectionStatus from "@/components/ConnectionStatus.vue";
 import CoverScreen from "@/components/CoverScreen.vue";
 import PhotoButton from "@/components/PhotoButton.vue";
-import ScreenshotGallery from "@/components/ScreenshotGallery.vue";
+import VideoButton from "@/components/VideoButton.vue";
+import MediaGallery from "@/components/MediaGallery.vue";
+import MediaPopup from "@/components/MediaPopup.vue";
 
-export type Screenshot = { img: string; key: any };
+export type MediaFile = { url: string; key: any; type: string };
 
-const props = defineProps<{ isControlsHidden: boolean }>();
+defineProps<{ isControlsHidden: boolean }>();
 const emit = defineEmits<{ (e: "sendCommand", key: string): void }>();
 
-const isDroneConnect = ref(true);
-const isVideoStreamOn = ref(true);
+const isDroneConnect = ref(false);
+const isVideoStreamOn = ref(false);
 
 const percentage = ref(0);
 const height = ref(0);
 const time = ref("00:00");
 
 const player: Ref<HTMLVideoElement> | Ref<null> = ref(null);
-const screenshots: Ref<Screenshot[]> = ref([]);
 
-const screenshotDB = new ScreenshotDB();
+const mediaDB = new MediaDB();
+const media: Ref<MediaFile[]> = ref([]);
+const isPopupOpen = ref(false);
+let popupMediaFile = reactive({}) as MediaFile;
+
+const isVideoRecording = ref(false);
+let videoRecorder: MediaRecorder;
+const recordedChunks: BlobPart[] = [];
+const fps = 30;
 
 onMounted(async () => {
-  //   const video = player.value;
-  //   if (video) {
-  //     const jmuxer = new JMuxer({
-  //       node: video,
-  //       mode: "video",
-  //       fps: 30,
-  //       debug: false,
-  //       flushingTime: 50,
-  //     });
-  //     socket.on(DroneEvent.VideoStreamOn, (stream) => {
-  //       const streamData = new Uint8Array(stream);
-  //       isVideoStreamOn.value = true;
-  //       jmuxer.feed({ video: streamData });
-  //     });
-  //     socket.on(DroneEvent.VideoStreamOff, () => {
-  //       console.warn("DroneEvent.VideoStreamOff");
-  //       isVideoStreamOn.value = false;
-  //     });
-  //     socket.on(DroneEvent.Status, () => {
-  //       console.warn("DroneEvent.Status");
-  //       isDroneConnect.value = true;
-  //     });
-  //     socket.on(DroneEvent.Disconnect, () => {
-  //       isDroneConnect.value = false;
-  //       isVideoStreamOn.value = false;
-  //     });
-  //     socket.on(DroneEvent.State, (state) => {
-  //       time.value = getTimeFromSeconds(+state?.time || 0);
-  //       percentage.value = +state?.bat;
-  //       height.value = +state?.h;
-  //     });
-  //   }
+  const video = player.value;
+  if (video) {
+    const jmuxer = new JMuxer({
+      node: video,
+      mode: "video",
+      fps,
+      debug: false,
+      flushingTime: 50,
+    });
+    socket.on(DroneEvent.VideoStreamOn, (stream) => {
+      const streamData = new Uint8Array(stream);
+      isVideoStreamOn.value = true;
+      jmuxer.feed({ video: streamData });
+    });
+    socket.on(DroneEvent.VideoStreamOff, () => {
+      console.warn("DroneEvent.VideoStreamOff");
+      isVideoStreamOn.value = false;
+    });
+    socket.on(DroneEvent.Status, () => {
+      console.warn("DroneEvent.Status");
+      isDroneConnect.value = true;
+    });
+    socket.on(DroneEvent.Disconnect, () => {
+      isDroneConnect.value = false;
+      isVideoStreamOn.value = false;
+    });
+    socket.on(DroneEvent.State, (state) => {
+      time.value = getTimeFromSeconds(+state?.time || 0);
+      percentage.value = +state?.bat;
+      height.value = +state?.h;
+    });
+  }
 
-  await getScreenshots();
+  await getAll();
 });
 
 function emitCommand(command: string) {
   emit("sendCommand", command);
 }
 
-async function doScreenshot() {
+function startRecording() {
+  if (!player.value) return;
+
+  const playerStream = player.value.captureStream(fps);
+  const mimeType = "video/webm;codecs=vp9";
+
+  isVideoRecording.value = true;
+
+  videoRecorder = new MediaRecorder(playerStream, { mimeType });
+  videoRecorder.start();
+
+  videoRecorder.ondataavailable = (event: { data: BlobPart }) => {
+    recordedChunks.push(event.data);
+
+    const blob = new Blob(recordedChunks, { type: "video/webm" });
+    saveMedia(blob);
+  };
+}
+
+function stopRecording() {
+  isVideoRecording.value = false;
+  videoRecorder.stop();
+}
+
+function openPopup(key: any) {
+  const mediaFile = media.value.find((item) => item.key === key);
+  if (mediaFile) {
+    popupMediaFile = mediaFile;
+    isPopupOpen.value = true;
+  }
+}
+
+function closePopup() {
+  popupMediaFile = {} as MediaFile;
+  isPopupOpen.value = false;
+}
+
+async function takePhoto() {
   const canvas = document.createElement("canvas") as HTMLCanvasElement;
   const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
 
@@ -116,29 +170,26 @@ async function doScreenshot() {
     canvas.height = droneVideoHeight;
 
     ctx.drawImage(player.value, 0, 0, droneVideoWidth, droneVideoHeight);
-    const screenshot = canvas.toDataURL("image/webp");
+    const img = canvas.toDataURL("image/png");
+    const blob = await fetch(img).then((res) => res.blob());
 
-    saveScreenshot(screenshot);
+    saveMedia(blob);
   }
 }
 
-async function saveScreenshot(img: string) {
-  const blob = await fetch(img).then((res) => res.blob());
-  const screenshot = await screenshotDB.saveScreenshot(blob);
-
-  screenshots.value.push(screenshot);
+async function saveMedia(blob: Blob) {
+  const item = await mediaDB.save(blob);
+  media.value.push(item);
 }
 
-async function deleteScreenshot(key: number) {
-  await screenshotDB.deleteScreenshot(key);
+async function deleteMedia(key: number) {
+  await mediaDB.delete(key);
 
-  screenshots.value = screenshots.value.filter(
-    (screenshot) => screenshot.key !== key
-  );
+  media.value = media.value.filter((item) => item.key !== key);
 }
 
-async function getScreenshots() {
-  screenshots.value = await screenshotDB.getScreenshots();
+async function getAll() {
+  media.value = await mediaDB.getAll();
 }
 
 function getTimeFromSeconds(time: number) {
@@ -200,7 +251,10 @@ function convertNumericToTime(numeric: number) {
   }
 }
 
-.photo-btn {
+.media-btn-container {
+  display: flex;
+  align-items: flex-end;
+  gap: 1em;
   position: absolute;
   bottom: 5%;
   left: 50%;

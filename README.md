@@ -20,7 +20,8 @@ DJI TELLO fullstack application
 
 ### Available commands
 
-| Command                 | Description                                                   |
-| ----------------------- | ------------------------------------------------------------- |
-| `npm run start `        | starts the development client and server                      |
-| `npm run start:client ` | starts the development only client with hot reloading enabled |
+| Command                 | Description                                              |
+| ----------------------- | -------------------------------------------------------- |
+| `npm run start `        | starts the development client and server                 |
+| `npm run start:client ` | starts the development client with hot reloading enabled |
+| `npm run start:server ` | starts the development server                            |

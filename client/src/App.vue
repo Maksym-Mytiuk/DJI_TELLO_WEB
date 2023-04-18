@@ -174,7 +174,7 @@ main {
 
   &.controls-hidden {
     position: absolute;
-    top: 100%;
+    top: 110%;
   }
 
   .sliders-wrapper {

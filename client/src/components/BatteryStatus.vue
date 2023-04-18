@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-const props = defineProps<{ percentage: number }>();
+defineProps<{ percentage: number }>();
 </script>
 
 <style lang="scss" scoped>

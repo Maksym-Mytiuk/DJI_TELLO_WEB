@@ -382,7 +382,7 @@
         <span class="sm">?<br />/</span>
       </button>
       <button
-        v-tooltip="`Take of the drone`"
+        v-tooltip="$t('takeOffDrone')"
         class="btn5 control-btn ShiftRight"
         @mousedown="onMouseDown('ShiftRight')"
       >
@@ -485,7 +485,7 @@
 import { onMounted, onUnmounted } from "vue";
 
 const emit = defineEmits<{ (e: "sendCommand", key: string): void }>();
-const props = defineProps<{
+defineProps<{
   degreeRotatePerRequest: number;
   cmFlyPerRequest: number;
 }>();

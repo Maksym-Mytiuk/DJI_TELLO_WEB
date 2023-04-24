@@ -15,7 +15,20 @@
     "url": "git+https://github.com/Maksym-Mytiuk/DJI_TELLO_WEB.git"
   },
   "keywords": [
-    "DJI TELLO"
+    "dji",
+    "tello",
+    "drone",
+    "controller",
+    "nodejs",
+    "vue",
+    "vue2",
+    "web-app",
+    "real-time",
+    "video",
+    "screenshot",
+    "recording",
+    "indexeddb",
+    "offline-storage"
   ],
   "author": "Maksym Mytiuk (m.mytiuk@gmail.com)",
   "license": "ISC",

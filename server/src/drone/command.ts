@@ -37,20 +37,4 @@ export const initialize = (socket: Socket) => {
       socket.emit("videostreamoff");
     }
   });
-
-  droneSocket.on("error", (err) => {
-    handleError(err);
-  });
-
-  droneSocket.on("close", () => {
-    console.warn("status close");
-  });
-
-  droneSocket.on("connect", () => {
-    console.warn("status connect");
-  });
-
-  droneSocket.on("listening", () => {
-    console.warn("status listening");
-  });
 };

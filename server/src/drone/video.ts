@@ -9,26 +9,6 @@ export const initialize = (socket: Socket) => {
   let counter = 0;
   let videoBuffer: Buffer[] = [];
 
-  // videoConnection.on("message", (message) => {
-  //   const buffer = Buffer.from(message);
-
-  //   if (buffer.includes(Buffer.from([0, 0, 0, 1]))) {
-  //     counter++;
-  //     if (counter === countFramePerRequest) {
-  //       counter = 0;
-  //       let stream = Buffer.concat(videoBuffer);
-  //       socket.emit("videostreamon", stream);
-
-  //       videoBuffer.length = 0;
-  //       videoBuffer = [];
-  //     }
-
-  //     videoBuffer.push(buffer);
-  //   } else {
-  //     videoBuffer.push(buffer);
-  //   }
-  // });
-
   videoConnection.on("message", (message) => {
     let buffer = Buffer.from(message);
     videoBuffer.push(buffer);

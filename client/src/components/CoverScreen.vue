@@ -33,11 +33,11 @@ p {
   color: white;
   cursor: pointer;
   transition: opacity 200ms;
-  animation: glow 1s infinite;
+  animation: blink 1s infinite;
   opacity: 1;
 }
 
-@keyframes glow {
+@keyframes blink {
   0% {
     opacity: 1;
   }

@@ -1,10 +1,5 @@
 <template>
   <div class="video-container" :class="{ 'controls-hidden': isControlsHidden }">
-    <CoverScreen
-      :isConnect="isDroneConnect"
-      :isVideoStreamOn="isVideoStreamOn"
-      @sendCommand="emitCommand"
-    />
     <div class="drone-statuses">
       <div class="col">
         <ConnectionStatus :isConnect="isDroneConnect" />
@@ -16,6 +11,11 @@
       </div>
     </div>
     <video ref="player" id="player" src="" autoplay></video>
+    <CoverScreen
+      :isConnect="isDroneConnect"
+      :isVideoStreamOn="isVideoStreamOn"
+      @sendCommand="emitCommand"
+    />
     <div class="media-btn-container">
       <PhotoButton v-if="isVideoStreamOn" @click="takePhoto" />
       <VideoButton
@@ -96,11 +96,9 @@ onMounted(async () => {
       jmuxer.feed({ video: streamData });
     });
     socket.on(DroneEvent.VideoStreamOff, () => {
-      console.warn("DroneEvent.VideoStreamOff");
       isVideoStreamOn.value = false;
     });
     socket.on(DroneEvent.Status, () => {
-      console.warn("DroneEvent.Status");
       isDroneConnect.value = true;
     });
     socket.on(DroneEvent.Disconnect, () => {

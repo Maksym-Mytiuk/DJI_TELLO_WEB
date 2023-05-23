@@ -4,7 +4,7 @@
 
 ## Project Description
 
-DJI TELLO WEB is a web app that allows you to connect and control your DJI Tello drone using a user-friendly interface. Built with Node.js and Vue 2, the app provides real-time video feed, screenshot capture, and video recording capabilities. All captured photos and videos are saved to IndexedDB for seamless offline storage.
+DJI TELLO WEB is a web app that allows you to connect and control your DJI Tello drone using a user-friendly interface. Built with Node.js and Vue 3, the app provides real-time video feed, screenshot capture, and video recording capabilities. All captured photos and videos are saved to IndexedDB for seamless offline storage.
 
 ## Features
 
